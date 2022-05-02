@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 
 namespace Manager
 {
@@ -16,7 +17,7 @@ namespace Manager
         private static int catalogPerStage = 15;
         private static int itemInDirector = 0;
 
-        public Paint(string path, int islevel)
+        public Paint(string? path, int islevel)
         {
             MyPath = path;
             Islevel = islevel;
@@ -51,9 +52,85 @@ namespace Manager
 
         public void RePaintAll(string path, int index, int stage) //перерисовываем все
         {
+
             Console.Clear();
             RePaintTop(path, index);
-            RePaintStructure(path, index, stage);
+            string? myFile = RePaintStructure(path, index, stage);
+            RePaintBot(myFile);
+        }
+
+        private void RePaintBot(string? file)
+        {
+            Console.WriteLine($"");
+            Console.WriteLine($"Информация:   ");
+
+            if (file != null && file != "..")
+            {
+                if (File.Exists(file))
+                {
+                    FileInfo fileInfo = new FileInfo(file);
+                    FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(file);
+                    Console.WriteLine($"Имя файла: {fileInfo.Name}");
+                    Console.WriteLine($"Версия файла: {myFileVersionInfo.FileVersion}");
+                    Console.WriteLine($"Дата создания файла: {File.GetCreationTime(file)}");
+                    Console.WriteLine($"Дата изменение файла: {File.GetLastWriteTime(file)}");
+                    Console.WriteLine($"Размер файла: {GetRazmerMB(fileInfo.Length)} Мбайт");
+                    Console.WriteLine($"Провообладатель: {myFileVersionInfo.LegalCopyright}");
+                }
+                else
+                {
+                    Console.WriteLine($"Имя директории: {Path.GetFileName(file)}");
+                    Console.WriteLine($"Дата создания директории: {Directory.GetCreationTime(file)}");
+                    Console.WriteLine($"Дата изменение директории: {Directory.GetLastWriteTime(file)}");
+                    double catalogSize = 0;
+                    Console.WriteLine($"Общий размер директории: {GetRazmerMB(SizeOfFolder(file, ref catalogSize))} Мбайт");
+                }
+            }
+            Console.WriteLine($"");
+
+            for (int i = 0; i < 100; i++)
+            {
+                Console.Write("-");
+            }
+            Console.WriteLine("");
+        }
+
+        static double SizeOfFolder(string folder, ref double catalogSize)
+        {
+            try
+            {
+                //В переменную catalogSize будем записывать размеры всех файлов, с каждым
+                //новым файлом перезаписывая данную переменную
+                DirectoryInfo di = new DirectoryInfo(folder);
+                DirectoryInfo[] diA = di.GetDirectories();
+                FileInfo[] fi = di.GetFiles();
+                //В цикле пробегаемся по всем файлам директории di и складываем их размеры
+                foreach (FileInfo f in fi)
+                {
+                    //Записываем размер файла в байтах
+                    catalogSize = catalogSize + f.Length;
+                }
+                //В цикле пробегаемся по всем вложенным директориям директории di 
+                foreach (DirectoryInfo df in diA)
+                {
+                    //рекурсивно вызываем наш метод
+                    SizeOfFolder(df.FullName, ref catalogSize);
+                }
+                return catalogSize;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private object GetRazmerMB(double length)
+        {
+            if (length != 0)
+            {
+                return Math.Round((double)(length / 1024 / 1024));
+            }
+            return 0;
         }
 
         private static void RePaintTop(string path, int index) //перерисовываем верх
@@ -71,7 +148,7 @@ namespace Manager
             Console.WriteLine("");
         }
 
-        static void RePaintStructure(string oldPath, int index, int stage) //перерисовываем каталоги
+        static string? RePaintStructure(string oldPath, int index, int stage) //перерисовываем каталоги
         {
             if (Directory.Exists(oldPath) )
             {
@@ -89,15 +166,28 @@ namespace Manager
                     }
                     ConsStagePaint(itemInDirector, stage);
                 }
+
+                for (int i = 0; i < 100; i++)
+                {
+                    Console.Write("-");
+                }
+                Console.WriteLine("");
+
+                if (index != -1)
+                {
+                    return (fullItem[index]);
+                }
+                else
+                {
+                    return null;
+                }    
+                    
             }
-            for (int i = 0; i < 100; i++)
-            {
-                Console.Write("-");
-            }
-            Console.WriteLine("");
+
+            return null;
         }
 
-        private static void ConsStagePaint(int length, int stage)
+        private static void ConsStagePaint(int length, int stage) //Разграниченный список
         {
             int cur = ((stage + 1) * catalogPerStage);
             cur = (cur > length) ? length : cur;

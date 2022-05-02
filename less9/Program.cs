@@ -90,7 +90,7 @@ namespace MyApp
                                             isErrorAccess = true;
                                         }
                                         else
-                                        { 
+                                        {
                                             Console.WriteLine("Отказано в доуступе: " + err.Message);
                                             isErrorAccess = true;
                                             Console.ReadKey();
@@ -112,17 +112,18 @@ namespace MyApp
                     }
                     else
                     {
-                        Console.WriteLine("");
-                        string? myCommand2 = Console.ReadLine();
+                        //Console.WriteLine("");
+                        string? myCommand2 = myCommand.KeyChar + Console.ReadLine();
+                        if (myCommand2 == "" || myCommand2 == null) { myCommand2 = ".";}
                         if (myCommand2[0] != '-')
                         {
                             Console.WriteLine("Неизвестная команда. Для отображение доступных команд наберите -hp");
-                            Console.ReadKey();
+                            Console.WriteLine("Нажмите клавишу...");
+                            Console.ReadLine();
                         }
                         else
                         {
                             string[]? regOut = RegularGo(myCommand2);
-
                             switch (regOut[0])
                             {
                                 case "hp":
@@ -131,8 +132,9 @@ namespace MyApp
                                         Console.WriteLine("Создать директорию в текущем каталоге -md <название>");
                                         Console.WriteLine("Удалить директорию -kd <путь>");
                                         Console.WriteLine("Удалить файл в текущем каталоге -kf <название>");
-                                        Console.WriteLine("Копировать директорию -cd <откуда> <куда>");
-                                        Console.WriteLine("Копировать файл -cf <откуда> <куда>");
+                                        Console.WriteLine("Копировать директорию -ld <откуда> <куда>");
+                                        Console.WriteLine("Копировать файла из текущего каталога -lf <откуда> <куда>");
+                                        Console.WriteLine("Нажмите клавишу...");
                                         Console.ReadKey();
                                     }
                                     break;
@@ -142,6 +144,7 @@ namespace MyApp
                                         if (Directory.Exists(regOut[1]) == false)
                                         {
                                             Console.WriteLine($"Такого пути не существует: {regOut[1]}");
+                                            Console.WriteLine("Нажмите клавишу...");
                                             Console.ReadKey();
                                         }
                                         else
@@ -158,6 +161,7 @@ namespace MyApp
                                         if (Directory.Exists(path + regOut[1] + @"\") == true)
                                         {
                                             Console.WriteLine($"Такой каталог уже существует: {path + regOut[1]}");
+                                            Console.WriteLine("Нажмите клавишу...");
                                             Console.ReadKey();
                                         }
                                         else
@@ -172,6 +176,8 @@ namespace MyApp
                                             catch (Exception err)
                                             {
                                                 Console.WriteLine("Упс. Произошла ошибка: " + err.Message);
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
                                             }
 
                                         }
@@ -183,6 +189,7 @@ namespace MyApp
                                         if (Directory.Exists(regOut[1]) == false)
                                         {
                                             Console.WriteLine($"Такого каталога не существует: {path + regOut[1]}");
+                                            Console.WriteLine("Нажмите клавишу...");
                                             Console.ReadKey();
                                         }
                                         else
@@ -191,11 +198,14 @@ namespace MyApp
                                             {
                                                 Directory.Delete(regOut[1], true);
                                                 Console.WriteLine($"Каталог удален: {regOut[1]}");
+                                                Console.WriteLine("Нажмите клавишу...");
                                                 Console.ReadKey();
                                             }
                                             catch (Exception err)
                                             {
                                                 Console.WriteLine("Упс. Произошла ошибка: " + err.Message);
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
                                             }
 
                                         }
@@ -206,6 +216,7 @@ namespace MyApp
                                         if (File.Exists(path + regOut[1]) == false)
                                         {
                                             Console.WriteLine($"Такого файла не существует: {path + regOut[1]}");
+                                            Console.WriteLine("Нажмите клавишу...");
                                             Console.ReadKey();
                                         }
                                         else
@@ -214,11 +225,77 @@ namespace MyApp
                                             {
                                                 Directory.Delete(path + regOut[1], true);
                                                 Console.WriteLine($"Файл удален: {path + regOut[1]}");
+                                                Console.WriteLine("Нажмите клавишу...");
                                                 Console.ReadKey();
                                             }
                                             catch (Exception err)
                                             {
                                                 Console.WriteLine("Упс. Произошла ошибка: " + err.Message);
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
+                                            }
+
+                                        }
+                                    }
+                                    break;
+                                case "ld":
+                                    {
+                                        if (Directory.Exists(regOut[1]) == false && Directory.Exists(regOut[2]) == false)
+                                        {
+                                            if (Directory.Exists(regOut[1]) == false)
+                                            {
+                                                Console.WriteLine($"Такого каталога не существует: {path + regOut[1]}");
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine($"Такого каталога не существует: {path + regOut[2]}");
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            try
+                                            {
+                                                CopyDirectory(regOut[1], regOut[2]);
+                                                Console.WriteLine($"Директория {regOut[1]} со вложенными файлами удачно скопирована в: {regOut[2]}");
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
+                                            }
+                                            catch (Exception err)
+                                            {
+                                                Console.WriteLine("Упс. Произошла ошибка: " + err.Message);
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
+                                            }
+
+                                        }
+                                    }
+                                    break;
+                                case "lf":
+                                    {
+                                        if (File.Exists(path + "\\" + regOut[1]) == false)
+                                        {
+                                            Console.WriteLine($"Такого файла не существует: {path + regOut[1]}");
+                                            Console.WriteLine("Нажмите клавишу...");
+                                            Console.ReadKey();
+                                        }
+                                        else
+                                        {
+                                            try
+                                            {
+                                                File.Copy(path + "\\" +  regOut[1], regOut[2] + "\\" + Path.GetFileName(regOut[1]), true);
+                                                Console.WriteLine($"Файл {regOut[1]} скопирован в: {regOut[2]}");
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
+                                            }
+                                            catch (Exception err)
+                                            {
+                                                Console.WriteLine("Упс. Произошла ошибка: " + err.Message);
+                                                Console.WriteLine("Нажмите клавишу...");
+                                                Console.ReadKey();
                                             }
 
                                         }
@@ -227,6 +304,7 @@ namespace MyApp
                                 default:
                                     {
                                         Console.WriteLine("Неизвестная команда. Для отображение доступных команд наберите -hp");
+                                        Console.WriteLine("Нажмите клавишу...");
                                         Console.ReadKey();
                                     }
                                     break;
@@ -239,17 +317,52 @@ namespace MyApp
             Console.ReadKey();
         }
 
+        static void CopyDirectory(string pathFrom, string pathIn)
+        {
+            string newPath = pathIn + "\\" + Path.GetFileName(pathFrom);
+
+            if (Directory.Exists(newPath) == false)
+            {
+                Directory.CreateDirectory(newPath);
+            }
+            foreach (string dir in Directory.GetDirectories(pathFrom))
+            {
+                CopyDirectory(dir, newPath);
+            }
+            foreach (string file in Directory.GetFiles(pathFrom))
+            {
+                string newfile = newPath + "\\" + Path.GetFileName(file);
+                try
+                {
+                    File.Copy(file, newPath + "\\" + Path.GetFileName(file), true);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+            }
+        }
 
         static string[]? RegularGo(string text)
         {
             string[]? outadata = new string[3];
-            Match match = Regex.Match(text, "\\-([a-z]{2})\\s?([a-z.\\:]*)?\\s?([a-z\\.:]*)?", RegexOptions.IgnoreCase);
+            try
+            {
+                Match match = Regex.Match(text, "\\-([a-z]{2})\\s?([a-z\\.\\:\\d\\\\]*)?\\s?([a-z\\.\\:\\d\\\\]*)?", RegexOptions.IgnoreCase);
+                outadata[0] = match.Groups[1].Value;
+                outadata[1] = match.Groups[2].Value;
+                outadata[2] = match.Groups[3].Value;
+                return outadata;
+            }
+            catch (Exception)
+            {
+                outadata[0] = "";
+                outadata[1] = "";
+                outadata[2] = "";
+                return outadata;
+            }
 
-            outadata[0] = match.Groups[1].Value;
-            outadata[1] = match.Groups[2].Value;
-            outadata[2] = match.Groups[3].Value;
-
-            return outadata;
         }
 
         // string[] getFile = Directory.GetFiles(oldPath).Select(Path.GetFileName).ToArray();
